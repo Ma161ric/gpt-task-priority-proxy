@@ -5,12 +5,14 @@ export default async function handler(req, res) {
 
   const { title, motivation, deadline } = req.body;
 
-  const prompt = `Bewerte die Wichtigkeit dieser Aufgabe (1 bis 5):
+  const prompt = `Du bist eine KI, die Aufgaben nach ihrer Wichtigkeit bewertet (1 = unwichtig, 5 = sehr wichtig).
+Gib nur eine Zahl von 1 bis 5 als Antwort zurück – keine Erklärung.
+
 Titel: ${title}
 Motivation: ${motivation}
 Deadline: ${deadline ?? 'keine'}
 
-Antworte nur mit einer Zahl von 1 bis 5.`;
+Antwort:`;
 
   try {
     const hfResponse = await fetch("https://api-inference.huggingface.co/models/gpt2", {
@@ -24,19 +26,20 @@ Antworte nur mit einer Zahl von 1 bis 5.`;
 
     const result = await hfResponse.json();
 
-    // Wenn Hugging Face einen Fehler liefert
+    // Fehlerprüfung
     if (result.error) {
-      console.error("HF API Error:", result);
+      console.error("Hugging Face API Error:", result);
       return res.status(500).json({ error: result.error });
     }
 
-    const text = result?.[0]?.generated_text ?? "3";
-    const rating = parseInt(text.match(/\d+/)?.[0] ?? "3", 10);
+    const generated = result?.[0]?.generated_text ?? "";
+    const match = generated.match(/\b[1-5]\b/); // Nur 1 bis 5
+    const rating = match ? parseInt(match[0], 10) : 3;
 
-    res.status(200).json({ rating: Math.max(1, Math.min(5, rating)) });
+    res.status(200).json({ rating });
 
-  } catch (e) {
-    console.error("Server-Fehler:", e);
-    res.status(500).json({ error: "Serverfehler", details: e.message });
+  } catch (error) {
+    console.error("Server-Fehler:", error);
+    res.status(500).json({ error: "Serverfehler", details: error.message });
   }
 }
