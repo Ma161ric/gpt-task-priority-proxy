@@ -15,7 +15,7 @@ Deadline: ${deadline ?? 'keine'}
 Antwort:`;
 
   try {
-    const hfResponse = await fetch("https://api-inference.huggingface.co/models/gpt2", {
+    const hfResponse = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-small", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
@@ -26,20 +26,19 @@ Antwort:`;
 
     const result = await hfResponse.json();
 
-    // Fehlerprüfung
     if (result.error) {
-      console.error("Hugging Face API Error:", result);
+      console.error("Hugging Face Error:", result);
       return res.status(500).json({ error: result.error });
     }
 
-    const generated = result?.[0]?.generated_text ?? "";
-    const match = generated.match(/\b[1-5]\b/); // Nur 1 bis 5
+    const output = result?.[0]?.generated_text ?? "";
+    const match = output.match(/\b[1-5]\b/);
     const rating = match ? parseInt(match[0], 10) : 3;
 
     res.status(200).json({ rating });
 
   } catch (error) {
-    console.error("Server-Fehler:", error);
+    console.error("Serverfehler:", error);
     res.status(500).json({ error: "Serverfehler", details: error.message });
   }
 }
