@@ -13,7 +13,7 @@ Deadline: ${deadline ?? 'keine'}
 Antworte nur mit einer Zahl von 1 bis 5.`;
 
   try {
-    const hfResponse = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
+    const hfResponse = await fetch("https://api-inference.huggingface.co/models/gpt2", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
