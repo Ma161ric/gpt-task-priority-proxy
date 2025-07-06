@@ -15,7 +15,7 @@ Deadline: ${deadline ?? 'keine'}
 Antwort:`;
 
   try {
-    const hfResponse = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-small", {
+    const hfResponse = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
